@@ -71,12 +71,12 @@ jobs:
             --format='%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
 
       - name: Ejecutar pylint (calidad y convenciones)
+        continue-on-error: true
         run: |
           pylint SafeBridge/ \
             --rcfile=.pylintrc \
             --fail-under=7.0 \
-            --ignore=__pycache__ \
-            || true  # No bloquea el pipeline, solo reporta
+            --ignore=__pycache__
 
   # =============================================================================
   # JOB 2: TEST — Pruebas Unitarias con Cobertura
@@ -186,14 +186,14 @@ jobs:
 
       # ─── Bandit: Análisis de seguridad específico para Python ────────────
       - name: Instalar y ejecutar Bandit
+        continue-on-error: true
         run: |
           pip install bandit[toml]
           bandit -r SafeBridge/ \
             -x SafeBridge/__pycache__,SafeBridge/tests \
             -f json \
             -o bandit-report.json \
-            --severity-level medium \
-            || true
+            --severity-level medium
 
       - name: Subir reporte Bandit
         uses: actions/upload-artifact@v4
@@ -205,12 +205,12 @@ jobs:
 
       # ─── pip-audit: Auditoría de paquetes con CVEs conocidos ─────────────
       - name: Ejecutar pip-audit (CVE en dependencias)
+        continue-on-error: true
         run: |
           pip install pip-audit
           pip-audit -r SafeBridge/requirements.txt \
             --format=json \
-            --output=pip-audit-report.json \
-            || true
+            --output=pip-audit-report.json
 
       - name: Subir reporte pip-audit
         uses: actions/upload-artifact@v4
